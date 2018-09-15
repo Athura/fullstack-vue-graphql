@@ -21,6 +21,9 @@ mongoose
     .then(() => console.log('DB connected'))
     .catch(err => console.error(err));
 
+// Set useCreateIndex
+mongoose.set('useCreateIndex', true);
+
 // Create apollo graphQl server using typeDefs, resolvers, and context 
 const server = new ApolloServer({
     typeDefs,
