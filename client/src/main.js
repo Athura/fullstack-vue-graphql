@@ -1,9 +1,9 @@
-import '@babel/polyfill'
-import Vue from 'vue'
-import './plugins/vuetify'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import "@babel/polyfill";
+import Vue from "vue";
+import "./plugins/vuetify";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
 
 import ApolloClient from "apollo-boost";
 import VueApollo from "vue-apollo";
@@ -12,7 +12,34 @@ Vue.use(VueApollo);
 
 // Setup ApolloClient
 export const defaultClient = new ApolloClient({
-  uri: "http://localhost:4000/graphql"
+  uri: "http://localhost:4000/graphql",
+  // include auth token with request made to backend
+  fetchOptions: {
+    credentials: "include"
+  },
+  request: operation => {
+    // if no token with key of 'token' in localstorage, add an empty one
+    if (!localStorage.token) {
+      localStorage.setItem("token", "");
+    }
+
+    // operation adds the token to authorization header, which is sent to backend
+    operation.setContext({
+      headers: {
+        authorization: localStorage.getItem("token")
+      }
+    });
+  },
+  onError: ({ graphQLErrors, networkError }) => {
+    if (networkError) {
+      console.log("[networkError]", networkError);
+    }
+    if (graphQLErrors) {
+      for (let err of graphQLErrors) {
+        console.dir(err);
+      }
+    }
+  }
 });
 
 const apolloProvider = new VueApollo({ defaultClient });
