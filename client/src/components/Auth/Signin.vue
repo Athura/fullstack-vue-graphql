@@ -7,27 +7,40 @@
             </v-flex>
         </v-layout>
 
+        <!-- Error Alert -->
+        <v-layout v-if="error" row wrap>
+            <v-flex xs12 sm6 offset-sm3>
+                <form-alert :message="error.message">
+
+                </form-alert>
+            </v-flex>
+        </v-layout>
+
         <!-- Sign in form -->
         <v-layout row wrap>
             <v-flex xs12 sm6 offset-sm3>
                 <v-card color="darkblue" dark>
                     <v-container>
-                        <v-form @submit.prevent="handleSignInUser">
+                        <v-form v-model="isFormValid" lazy-validation ref="form" @submit.prevent="handleSignInUser">
                             <v-layout row>
                                 <v-flex xs12>
-                                    <v-text-field v-model="username" prepend-icon="face" label="Username" type="text" required></v-text-field>
+                                    <v-text-field :rules="usernameRules" v-model="username" prepend-icon="face" label="Username" type="text" required></v-text-field>
                                 </v-flex>
                             </v-layout>
 
                             <v-layout row>
                                 <v-flex xs12>
-                                    <v-text-field v-model="password" prepend-icon="extension" label="Password" type="password" required></v-text-field>
+                                    <v-text-field :rules='passwordRules' v-model="password" prepend-icon="extension" label="Password" type="password" required></v-text-field>
                                 </v-flex>
                             </v-layout>
 
                             <v-layout row>
                                 <v-flex xs12>
-                                    <v-btn color="primary" type="submit">Signin</v-btn>
+                                    <v-btn :loading="loading" :disabled="!isFormValid" color="primary" type="submit">
+                                        <span slot="loader" class="custom-loader">
+                                            <v-icon light>cached</v-icon>
+                                        </span>
+                                        Signin</v-btn>
                                     <h3>Don't have an account?
                                         <router-link to="/signup">Signup</router-link>
                                     </h3>
@@ -42,21 +55,90 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "Signin",
   data() {
     return {
+      isFormValid: true,
       username: "",
-      password: ""
+      password: "",
+      usernameRules: [
+        // Check if username in input, the !! converts username text to boolean
+        username => !!username || "Username is required",
+        // Make sure username is less than 10 characters
+        username =>
+          username.length < 10 || "Username must be less than 10 characters"
+      ],
+      passwordRules: [
+        password => !!password || "Password is required",
+        // Make sure password is at least 7 characters
+        password =>
+          password.length >= 7 || "Password must be at least 7 characters."
+      ]
     };
+  },
+  computed: {
+    ...mapGetters(["loading", "user", "error"])
+  },
+  watch: {
+    user(value) {
+      // if user value changes from null to an object, redirect to home page
+      if (value) {
+        this.$router.push("/");
+      }
+    }
   },
   methods: {
     handleSignInUser() {
-      this.$store.dispatch("signinUser", {
-        username: this.username,
-        password: this.password
-      });
+      if (this.$refs.form.validate()) {
+        this.$store.dispatch("signinUser", {
+          username: this.username,
+          password: this.password
+        });
+      }
     }
   }
 };
 </script>
+
+
+<style>
+.custom-loader {
+  animation: loader 1s infinite;
+  display: flex;
+}
+@-moz-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-o-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

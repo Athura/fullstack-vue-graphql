@@ -21,6 +21,14 @@
             {{item.title}}
           </v-list-tile-content>
         </v-list-tile>
+
+        <!-- Signout button -->
+        <v-list-tile v-if="user" @click="handleSignoutUser">
+          <v-list-tile-action>
+            <v-icon>exit_to_app</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>Signout</v-list-tile-content>
+        </v-list-tile>
       </v-list>
 
     </v-navigation-drawer>
@@ -47,6 +55,22 @@
           <v-icon class="hidden-sm-only" left>{{item.icon}}</v-icon>
           {{item.title}}
         </v-btn>
+
+        <!-- Profile Button -->
+        <v-btn flat to="/profile" v-if="user">
+          <v-icon class="hidden-sm-only" left>account_box</v-icon>
+          <v-badge right color="error darken-2">
+            <!-- <span slot="badge">1</span> -->
+            Profile
+          </v-badge>
+        </v-btn>
+
+        <!-- Signout button -->
+        <v-btn flat v-if="user" @click="handleSignoutUser">
+          <v-icon class="hidden-sm-only" left>exit_to_app</v-icon>
+          Signout
+        </v-btn>
+
       </v-toolbar-items>
     </v-toolbar>
 
@@ -56,37 +80,86 @@
         <transition name="fade">
           <router-view/>
         </transition>
+
+        <!-- Auth Snackbar -->
+        <v-snackbar v-model ="authSnackbar" color="success" :timeout='5000' bottom right>
+          <v-icon class="mr-3">check_circle</v-icon>
+          <h3>You are now signed in!</h3>
+          <v-btn dark flat @click="authSnackbar = false">Close</v-btn>
+        </v-snackbar>
+
+        <!-- Auth error Snackbar -->
+        <v-snackbar v-if="authError" v-model="authErrorSnackbar" color="info" :timeout='5000' bottom right>
+          <v-icon class="mr-3">cancel</v-icon>
+          <h3>{{authError.message}}</h3>
+          <v-btn dark flat to="/signin">Sign-in</v-btn>
+        </v-snackbar>
+
+
       </v-container>
-      
     </main>
   </v-app>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "App",
   data() {
     return {
+      authSnackbar: false,
+      authErrorSnackbar: false,
       sideNav: false
     };
   },
+  watch: {
+    user(newValue, oldValue) {
+      // If we had no value for user before, show snackbar
+      if (oldValue === null) {
+        this.authSnackbar = true;
+      }
+    },
+    authError(value) {
+      // if auth error is not null, show auth error snackbar
+      if (value !== null) {
+        this.authErrorSnackbar = true;
+      }
+    }
+  },
   computed: {
+    ...mapGetters(["authError", "user"]),
     horizontalNavItems() {
-      return [
+      let items = [
         { icon: "chat", title: "Posts", link: "/posts" },
         { icon: "lock_open", title: "Sign In", link: "/signin" },
         { icon: "create", title: "Sign Up", link: "/signup" }
       ];
+      if (this.user) {
+        items = [{ icon: "chat", title: "Posts", link: "/posts" }];
+      }
+      return items;
     },
     sideNavItems() {
-      return [
+      let items = [
         { icon: "chat", title: "Posts", link: "/posts" },
         { icon: "lock_open", title: "Sign In", link: "/signin" },
         { icon: "create", title: "Sign Up", link: "/signup" }
       ];
+      if (this.user) {
+        items = [
+          { icon: "chat", title: "Posts", link: "/posts" },
+          { icon: "stars", title: "Create Post", link: "/posts/add" },
+          { icon: "account_box", title: "Profile", link: "/profile" }
+        ];
+      }
+      return items;
     }
   },
   methods: {
+    handleSignoutUser() {
+      this.$store.dispatch("signoutUser");
+    },
     toggleSideNav() {
       this.sideNav = !this.sideNav;
     }
@@ -95,20 +168,20 @@ export default {
 </script>
 
 <style>
-  .fade-enter-active,
-  .fade-leave-active {
-    transition-property: all;
-    transition-duration: 0.25s;
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition-property: all;
+  transition-duration: 0.25s;
+}
 
-  .fade-enter-active {
-    transition-delay: 0.25s;
-  }
+.fade-enter-active {
+  transition-delay: 0.25s;
+}
 
-  .fade-enter,
-  .fade-leave-active {
-    opacity: 0;
-    transform: translateX(-25px);
-  }
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
+  transform: translateX(-25px);
+}
 </style>
 
