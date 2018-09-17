@@ -28,7 +28,7 @@ export default new Router({
       component: Posts
     },
     {
-      path: "/post/add",
+      path: "/posts/add",
       name: "AddPost",
       component: AddPost
     },

@@ -2,8 +2,15 @@ import Vue from "vue";
 import Vuex from "vuex";
 import router from "./router";
 
-import { defaultClient as apolloClient } from "./main";
-import { GET_POSTS, SIGNIN_USER, GET_CURRENT_USER } from "./queries";
+import {
+  defaultClient as apolloClient
+} from "./main";
+import {
+  GET_POSTS,
+  SIGNIN_USER,
+  SIGNUP_USER,
+  GET_CURRENT_USER
+} from "./queries";
 
 Vue.use(Vuex);
 
@@ -35,13 +42,17 @@ export default new Vuex.Store({
     clearError: state => (state.error = null),
   },
   actions: {
-    getCurrentUser: ({ commit }) => {
+    getCurrentUser: ({
+      commit
+    }) => {
       commit("setLoading", true);
       apolloClient
         .query({
           query: GET_CURRENT_USER
         })
-        .then(({ data }) => {
+        .then(({
+          data
+        }) => {
           commit("setLoading", false);
           // Add user data to state
           commit("setUser", data.getCurrentUser);
@@ -52,14 +63,18 @@ export default new Vuex.Store({
           console.error(err);
         });
     },
-    getPosts: ({ commit }) => {
+    getPosts: ({
+      commit
+    }) => {
       commit("setLoading", true);
       // Use apollo client to fire getPosts query
       apolloClient
         .query({
           query: GET_POSTS
         })
-        .then(({ data }) => {
+        .then(({
+          data
+        }) => {
           // Get data from actions to state via mutations
           // commit allows us to pass data from action to mutation function
           commit("setPosts", data.getPosts);
@@ -70,17 +85,19 @@ export default new Vuex.Store({
           console.log(err);
         });
     },
-    signinUser: ({ commit }, payload) => {
+    signinUser: ({
+      commit
+    }, payload) => {
       commit('clearError');
       commit('setLoading', true);
-      // clear token to prevent errors (if malformed)
-      localStorage.setItem("token", "");
       apolloClient
         .mutate({
           mutation: SIGNIN_USER,
           variables: payload
         })
-        .then(({ data }) => {
+        .then(({
+          data
+        }) => {
           commit('setLoading', false);
           console.log(data.signinUser);
           localStorage.setItem("token", data.signinUser.token);
@@ -93,7 +110,35 @@ export default new Vuex.Store({
           console.error(err);
         });
     },
-    signoutUser: async ({ commit }) => {
+    signupUser: ({
+      commit
+    }, payload) => {
+      commit('clearError');
+      commit('setLoading', true);
+      // clear token to prevent errors (if malformed)
+      localStorage.setItem("token", "");
+      apolloClient
+        .mutate({
+          mutation: SIGNUP_USER,
+          variables: payload
+        })
+        .then(({
+          data
+        }) => {
+          commit('setLoading', false);
+          localStorage.setItem("token", data.signupUser.token);
+          // To make sure created method is run in main.js (we run getCurrentUser ), reload the page
+          router.go();
+        })
+        .catch(err => {
+          commit('setLoading', false);
+          commit("setError", err);
+          console.error(err);
+        });
+    },
+    signoutUser: async ({
+      commit
+    }) => {
       // clear the user in state
       commit("clearUser");
       // remove token in local storage
