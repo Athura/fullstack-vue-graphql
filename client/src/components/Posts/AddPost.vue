@@ -43,7 +43,7 @@
                             <!-- Description -->
                             <v-layout row>
                                 <v-flex xs12>
-                                    <v-textarea :rules="descRules" v-model="desc" label="Image Description" type="text" required></v-textarea>
+                                    <v-textarea :rules="descRules" v-model="description" label="Image Description" type="text" required></v-textarea>
                                 </v-flex>
                             </v-layout>
 
@@ -63,30 +63,49 @@
 </template>
 
 <script>
-    export default {
-        name: 'AddPost',
-        data() {
-            return {
-                isFormValid: true,
-                title: '',
-                imageUrl: '',
-                categories: [],
-                description: '',
-                titleRules: [
-                    title => !!title || 'Title is required',
-                    title => title.length < 20 || 'Title must have less than 20 characters'
-                ],
-                imageRules: [
-                    image => !!image || 'Image is required'
-                ],
-                categoriesRules: [
-                    categories => !!categories.length >= 1 || 'At least one category is required'
-                ],
-                descRules: [
-                    desc => !!desc || 'Description is required',
-                    desc => desc.length < 200 || 'Description must have less than 200 characters'
-                ]
-            }
-        }
+import { mapGetters } from 'vuex';
+
+export default {
+  name: 'AddPost',
+  data() {
+    return {
+      isFormValid: true,
+      title: '',
+      imageUrl: '',
+      categories: [],
+      description: '',
+      titleRules: [
+        title => !!title || 'Title is required',
+        title => title.length < 20 || 'Title must have less than 20 characters'
+      ],
+      imageRules: [image => !!image || 'Image is required'],
+      categoriesRules: [
+        categories =>
+          !!categories.length >= 1 || 'At least one category is required'
+      ],
+      descRules: [
+        description => !!description || 'Description is required',
+        description =>
+          description.length < 200 ||
+          'Description must have less than 200 characters'
+      ]
+    };
+  },
+  computed: {
+    ...mapGetters(['loading', 'user'])
+  },
+  methods: {
+    handleAddPost() {
+      if (this.$refs.form.validate()) {
+        this.$store.dispatch('addPost', {
+          title: this.title,
+          imageUrl: this.imageUrl,
+          categories: this.categories,
+          description: this.description,
+          creatorId: this.user._id
+        });
+      }
     }
+  }
+};
 </script>

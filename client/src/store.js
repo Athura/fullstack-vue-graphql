@@ -9,7 +9,8 @@ import {
   GET_POSTS,
   SIGNIN_USER,
   SIGNUP_USER,
-  GET_CURRENT_USER
+  GET_CURRENT_USER,
+  ADD_POST
 } from "./queries";
 
 Vue.use(Vuex);
@@ -84,6 +85,49 @@ export default new Vuex.Store({
           commit("setLoading", false);
           console.log(err);
         });
+    },
+    addPost: ({
+      commit
+    }, payload) => {
+      apolloClient
+        .mutate({
+          mutation: ADD_POST,
+          variables: payload,
+          update: (cache, {
+            data: {
+              addPost
+            }
+          }) => {
+            // First read the query you want to update
+            const data = cache.readQueryFromStore({
+              query: GET_POSTS
+            });
+            // Create updated data
+            data.getPosts.unshift(addPost);
+            // Write updated data back to query
+            cache.writeQuery({
+              query: GET_POSTS,
+              data
+            });
+          },
+          // optimistic response ensures data is added immediately as we specified for the update function
+          optimisticResponse: {
+            __typename: 'Mutation',
+            addPost: {
+              __typename: 'Post',
+              _id: -1,
+              ...payload
+            }
+          }
+        })
+        .then(({
+          data
+        }) => {
+          console.log(data.addPost);
+        })
+        .catch(err => {
+          console.log(err);
+        })
     },
     signinUser: ({
       commit
