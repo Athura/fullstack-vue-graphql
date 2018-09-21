@@ -1,7 +1,9 @@
-import { gql } from "apollo-boost";
+import {
+  gql
+} from "apollo-boost";
 
 // Posts queries
-export const GET_POSTS = gql`
+export const GET_POSTS = gql `
   query {
     getPosts {
       _id
@@ -11,7 +13,7 @@ export const GET_POSTS = gql`
   }
 `;
 
-export const GET_POST = gql`
+export const GET_POST = gql `
   query($postId: ID!) {
     getPost(postId: $postId) {
       _id
@@ -36,7 +38,7 @@ export const GET_POST = gql`
 `;
 
 // User Queries
-export const GET_CURRENT_USER = gql`
+export const GET_CURRENT_USER = gql `
   query {
     getCurrentUser {
       _id
@@ -54,7 +56,7 @@ export const GET_CURRENT_USER = gql`
   }
 `;
 
-export const INFINITE_SCROLL_POSTS = gql`
+export const INFINITE_SCROLL_POSTS = gql `
   query($pageNum: Int!, $pageSize: Int!) {
     infiniteScrollPosts(pageNum: $pageNum, pageSize: $pageSize) {
       hasMore
@@ -80,7 +82,7 @@ export const INFINITE_SCROLL_POSTS = gql`
 `;
 
 // Posts mutations
-export const ADD_POST = gql`
+export const ADD_POST = gql `
 mutation($title:String!, $imageUrl: String!, $categories:[String]!, $description:String!, $creatorId:ID!) {
   addPost(
     title:$title,
@@ -99,8 +101,23 @@ mutation($title:String!, $imageUrl: String!, $categories:[String]!, $description
 }
 `
 
+export const ADD_POST_MESSAGE = gql `
+  mutation($messageBody: String!, $userId: ID!, $postId: ID!) {
+    addPostMessage(messageBody: $messageBody, userId: $userId, postId: $postId) {
+      _id
+      messageBody
+      messageDate
+      messageUser {
+        _id
+        username
+        avatar
+      }
+    }
+  }
+`;
+
 // User mutations
-export const SIGNIN_USER = gql`
+export const SIGNIN_USER = gql `
   mutation($username: String!, $password: String!) {
     signinUser(username: $username, password: $password) {
       token
@@ -108,7 +125,7 @@ export const SIGNIN_USER = gql`
   }
 `;
 
-export const SIGNUP_USER = gql`
+export const SIGNUP_USER = gql `
   mutation($username: String!, $email: String!, $password: String!) {
     signupUser(username: $username, email: $email, password: $password) {
       token
