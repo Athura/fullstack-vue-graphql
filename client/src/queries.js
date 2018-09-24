@@ -37,6 +37,18 @@ export const GET_POST = gql `
   }
 `;
 
+export const SEARCH_POSTS = gql`
+  query($searchTerm: String) {
+    searchPosts(searchTerm: $searchTerm) {
+      _id
+      title
+      description
+      imageUrl
+      likes
+    }
+  }
+`;
+
 // User Queries
 export const GET_CURRENT_USER = gql `
   query {
@@ -99,7 +111,33 @@ mutation($title:String!, $imageUrl: String!, $categories:[String]!, $description
     createdDate
   }
 }
-`
+`;
+
+export const LIKE_POST = gql`
+  mutation($postId: ID!, $username: String!) {
+    likePost(postId: $postId, username: $username) {
+      likes
+      favorites {
+        _id
+        title
+        imageUrl
+      }
+    }
+  }
+`;
+
+export const UNLIKE_POST = gql`
+  mutation($postId: ID!, $username: String!) {
+    unlikePost(postId: $postId, username: $username) {
+      likes
+      favorites {
+        _id
+        title
+        imageUrl
+      }
+    }
+  }
+`;
 
 export const ADD_POST_MESSAGE = gql `
   mutation($messageBody: String!, $userId: ID!, $postId: ID!) {
