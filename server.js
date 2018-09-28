@@ -4,19 +4,17 @@ const fs = require("fs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 
-// import typeDefs and resolvers
+// Import typeDefs and resolvers
 const filePath = path.join(__dirname, "typeDefs.gql");
 const typeDefs = fs.readFileSync(filePath, "utf-8");
 const resolvers = require("./resolvers");
 
-// Import environment variables and mongoose models
-require("dotenv").config({
-  path: "variables.env"
-});
+// Import Environment Variables and Mongoose Models
+require("dotenv").config({ path: "variables.env" });
 const User = require("./models/User");
 const Post = require("./models/Post");
 
-// Connect to mlab database
+// Connect to MLab Database
 mongoose
   .connect(
     process.env.MONGO_URI,
@@ -25,10 +23,7 @@ mongoose
   .then(() => console.log("DB connected"))
   .catch(err => console.error(err));
 
-// Set useCreateIndex
-mongoose.set("useCreateIndex", true);
-
-// Verify JWT token passed from client
+// Verify JWT Token passed from client
 const getUser = async token => {
   if (token) {
     try {
@@ -41,13 +36,13 @@ const getUser = async token => {
   }
 };
 
-// Create apollo graphQl server using typeDefs, resolvers, and context
+// Create Apollo/GraphQL Server using typeDefs, resolvers, and context object
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  formatErrors: error => ({
+  formatError: error => ({
     name: error.name,
-    message: error.message.replace('Context creation failed:', '')
+    message: error.message.replace("Context creation failed:", "")
   }),
   context: async ({ req }) => {
     const token = req.headers["authorization"];
@@ -55,6 +50,6 @@ const server = new ApolloServer({
   }
 });
 
-server.listen().then(({ url }) => {
+server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
   console.log(`Server listening on ${url}`);
 });

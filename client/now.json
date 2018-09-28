@@ -1,0 +1,17 @@
+{
+    "name": "vue-share",
+    "type": "static",
+    "static": {
+      "public": "dist",
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    "alias": "vue-fullstack-example-jj",
+    "files": [
+      "dist"
+    ]
+  }

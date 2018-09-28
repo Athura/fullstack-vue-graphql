@@ -4,13 +4,13 @@ import Home from "./components/Home.vue";
 
 import AddPost from "./components/Posts/AddPost.vue";
 import Posts from "./components/Posts/Posts.vue";
-import Post from './components/Posts/Post.vue';
+import Post from "./components/Posts/Post.vue";
 
 import Profile from "./components/Auth/Profile.vue";
 import Signin from "./components/Auth/Signin.vue";
 import Signup from "./components/Auth/Signup.vue";
 
-import AuthGuard from './AuthGuard';
+import AuthGuard from "./AuthGuard";
 
 Vue.use(Router);
 
@@ -35,13 +35,14 @@ export default new Router({
       props: true
     },
     {
-      path: "/posts/add",
+      path: "/post/add",
       name: "AddPost",
-      component: AddPost
+      component: AddPost,
+      beforeEnter: AuthGuard
     },
     {
       path: "/profile",
-      name: "profile",
+      name: "Profile",
       component: Profile,
       beforeEnter: AuthGuard
     },
@@ -51,7 +52,7 @@ export default new Router({
       component: Signin
     },
     {
-      path: "/signup",
+      path: "/Signup",
       name: "Signup",
       component: Signup
     }

@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "deploy": "npm run build && now --public && now alias"
   },
   "dependencies": {
     "apollo-boost": "^0.1.16",
+    "moment": "^2.22.2",
     "vue": "^2.5.17",
     "vue-apollo": "^3.0.0-beta.25",
     "vue-router": "^3.0.1",
